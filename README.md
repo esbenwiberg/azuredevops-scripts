@@ -62,6 +62,69 @@ python3 devops-pr-report.py --all --no-files
 - User comparison table and bar chart
 - Filterable PR cards with branches, reviewers, file changes, and diff stats
 
+### time-report.py
+
+Generates a per-day work activity summary for time registration. Combines Azure DevOps PRs, Claude Code session history, local git commits, and optionally MS365 calendar events.
+
+**Usage:**
+
+```bash
+# Last 2 weeks (default)
+python3 time-report.py
+
+# Specific date range
+python3 time-report.py --from 2026-02-01 --to 2026-02-15
+
+# Single day
+python3 time-report.py --date 2026-02-11
+
+# Specific DevOps project(s)
+python3 time-report.py --project "TeamPlanner - V3"
+
+# All DevOps projects
+python3 time-report.py --all-projects
+
+# Include MS365 calendar events
+python3 time-report.py --calendar
+
+# Output as JSON (for piping to other tools)
+python3 time-report.py --json
+
+# Skip specific sources
+python3 time-report.py --no-devops --no-git
+```
+
+**Options:**
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `--from` | Start date (YYYY-MM-DD) | 14 days ago |
+| `--to` | End date (YYYY-MM-DD) | Today |
+| `--date` | Single date (YYYY-MM-DD) | — |
+| `--days` | Look-back period in days | 14 |
+| `--project` | DevOps project(s), comma-separated | Default from `az devops configure` |
+| `--all-projects` | Scan all DevOps projects | Off |
+| `--calendar` | Include MS365 calendar events | Off |
+| `--no-devops` | Skip Azure DevOps PRs | Off |
+| `--no-claude` | Skip Claude Code history | Off |
+| `--no-git` | Skip git commit history | Off |
+| `--json` | Output JSON instead of text | Off |
+
+**Data sources:**
+
+| Tag | Source | What it shows |
+|-----|--------|---------------|
+| `PR` | Azure DevOps | PRs created or merged on that day |
+| `CODE` | Claude Code `~/.claude/history.jsonl` | Projects with active sessions |
+| `GIT` | Local git repos | Commit counts per repo |
+| `CAL` | MS365 Calendar (Graph API) | Meetings and events |
+
+**Calendar setup:** Requires a one-time browser login with Graph scope:
+
+```bash
+az login --scope "https://graph.microsoft.com/Calendars.Read"
+```
+
 ### devops-prs.sh
 
 Quick terminal check for your active PRs and pending reviews.
